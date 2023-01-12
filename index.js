@@ -39,13 +39,13 @@ app.post("/create-student", async (req, res) => {
 
 // assign a mentor
 
-app.put("/assign-mentor/:id", async (req, res) => {
+app.put("/assignMentor", async (req, res) => {
   try {
     let client = await mongoClient.connect(dbURL);
-    console.log(req.body.student_name);
+
     let db = client.db("Mentor");
     await db
-      .collection("students")
+      .collection("mentors")
       .updateOne(
         { std_Id: req.body.student_Id },
         { $set: { mentor_Id: req.body.mentor_Id } }
@@ -56,15 +56,17 @@ app.put("/assign-mentor/:id", async (req, res) => {
     res.sendStatus(500);
   }
 });
-app.patch("/mentor/:mentorId/students", async (req, res) => {
+app.patch("/assignStudent", async (req, res) => {
   try {
     let client = await mongoClient.connect(dbURL);
     let db = client.db("Mentor");
     await db
       .collection("mentors")
-      .findById(req.params.mentorId)
-      .concat(req.body.studentIds);
-    await mentor.save();
+      .updateOne(
+        { mentor_name: req.body.mentor_name },
+        { $push: { students: { $each: req.body.studentNames } } }
+      );
+
     res.status(200).json({ message: "Students successfully added to mentor" });
   } catch (err) {
     res
@@ -75,25 +77,25 @@ app.patch("/mentor/:mentorId/students", async (req, res) => {
 
 // assign a student
 
-app.put("/assign-student/:id", async (req, res) => {
-  try {
-    let client = await mongoClient.connect(dbURL);
-    let db = client.db("Mentor");
-    await db
-      .collection("mentors")
-      .updateOne(
-        { mentor_Id: req.params.id },
-        { $push: { students: req.body } }
-      );
-    let result = await db.collection("mentors").find({}).toArray();
-    res.status(200).json({
-      message: "mentor assigned or changed to a particular student",
-      result,
-    });
-  } catch (error) {
-    res.sendStatus(500);
-  }
-});
+// app.put("/assign-student/:id", async (req, res) => {
+//   try {
+//     let client = await mongoClient.connect(dbURL);
+//     let db = client.db("Mentor");
+//     await db
+//       .collection("mentors")
+//       .updateOne(
+//         { mentor_Id: req.params.id },
+//         { $push: { students: req.body } }
+//       );
+//     let result = await db.collection("mentors").find({}).toArray();
+//     res.status(200).json({
+//       message: "mentor assigned or changed to a particular student",
+//       result,
+//     });
+//   } catch (error) {
+//     res.sendStatus(500);
+//   }
+// });
 // read students list
 
 app.get("/students-list", async (req, res) => {
