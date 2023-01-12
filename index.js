@@ -9,6 +9,8 @@ const dbURL = process.env.DB_URL;
 app.use(express.json());
 app.use(cors());
 
+//Home--------------------------------------------------
+
 app.get("/", function (req, res) {
   res.send("🙋‍♂️, 🌏 🎊✨🤩");
 });
@@ -25,6 +27,9 @@ app.post("/create-mentor", async (req, res) => {
     res.sendStatus(500);
   }
 });
+
+//-----------------------------------------------------------------------------------------//
+
 // create a student
 app.post("/create-student", async (req, res) => {
   try {
@@ -37,7 +42,9 @@ app.post("/create-student", async (req, res) => {
   }
 });
 
-// assign a mentor
+//-----------------------------------------------------------------------------------------//
+
+// assign a mentor->Select One Student and Assign one Mentor
 
 app.put("/assignMentor", async (req, res) => {
   try {
@@ -56,6 +63,12 @@ app.put("/assignMentor", async (req, res) => {
     res.sendStatus(500);
   }
 });
+
+//-----------------------------------------------------------------------------------------//
+
+//Select one mentor and Add multiple Student
+//A student who has a mentor should not be shown in List->easy we can filter in frontEnd
+
 app.patch("/assignStudent", async (req, res) => {
   try {
     let client = await mongoClient.connect(dbURL);
@@ -75,27 +88,8 @@ app.patch("/assignStudent", async (req, res) => {
   }
 });
 
-// assign a student
+//-----------------------------------------------------------------------------------------//
 
-// app.put("/assign-student/:id", async (req, res) => {
-//   try {
-//     let client = await mongoClient.connect(dbURL);
-//     let db = client.db("Mentor");
-//     await db
-//       .collection("mentors")
-//       .updateOne(
-//         { mentor_Id: req.params.id },
-//         { $push: { students: req.body } }
-//       );
-//     let result = await db.collection("mentors").find({}).toArray();
-//     res.status(200).json({
-//       message: "mentor assigned or changed to a particular student",
-//       result,
-//     });
-//   } catch (error) {
-//     res.sendStatus(500);
-//   }
-// });
 // read students list
 
 app.get("/students-list", async (req, res) => {
@@ -109,6 +103,8 @@ app.get("/students-list", async (req, res) => {
   }
 });
 
+//-----------------------------------------------------------------------------------------//
+
 // read mentors list
 
 app.get("/mentors-list", async (req, res) => {
@@ -121,6 +117,8 @@ app.get("/mentors-list", async (req, res) => {
     res.sendStatus(500);
   }
 });
+
+//-----------------------------------------------------------------------------------------//
 
 // students without mentor
 app.get("/idle-students", async (req, res) => {
@@ -139,6 +137,8 @@ app.get("/idle-students", async (req, res) => {
     res.sendStatus(500);
   }
 });
+
+//-----------------------------------------------------------------------------------------//
 
 // students under mentor
 app.get("/students-under-mentor/:mentor_name", async (req, res) => {
